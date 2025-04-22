@@ -1,5 +1,18 @@
 from openpyxl import load_workbook
 import sqlite3
+import ipaddress
+import sys
+
+
+def validateIP(ip):
+    try:
+        ipaddress.ip_address(ip)
+        print(f"Valid IP address: {ip} ")
+
+    except ValueError:
+        print(f"Invalid Ip address: {ip} exiting ...")
+        sys.exit(1)
+
 
 file_path = "./config-changes.xlsx"
 
@@ -31,6 +44,14 @@ BAND_INDICATOR_1 = sheet['D8'].value
 BAND_INDICATOR_2 = sheet['E8'].value
 
 MME_IP_ADDRESS = sheet['B9'].value
+BBU_IP_ADDRESS = sheet['B10'].value
+
+
+
+
+validateIP(MME_IP_ADDRESS)
+validateIP(BBU_IP_ADDRESS)
+
 
 # print(PLMN, TAC)
 
@@ -127,6 +148,34 @@ with sqlite3.connect(db_path) as conn:
 
     cursor.execute(update_mme_ip_query_MMECommInfoTable, (MME_IP_ADDRESS,))
 
+
+    # Update BBU IP Address
+    # IpInterfaceTable     ---> IPInterfaceIPAddress where X_VENDOR_INTERFACE_TYPE ,X_VENDOR_SOURCE_PORT_NUMBER
+    # 'OAM_S1AP_INTERFACE','36412'
+    # 'OAM_X2AP_INTERFACE',36422
+    # 'OAM_GTPU_INTERFACE',2152, 
+    # globalEnbIdInfoTable  --> henb_self_address
+
+
+
+    # Tr69InitParamsTable  --> ConnectionRequestURL --> 'http://10.131.183.31:15210'
+    # EnodeBEMSIpsecTable   --> ENBIpAddress
+    # ipAddressTable        --> ?
+
+    update_bbu_ip_query_IpInterfaceTable = """ UPDATE IpInterfaceTable SET IPInterfaceIPAddress = ? 
+    where Enable = '1' and (
+        (X_VENDOR_INTERFACE_TYPE = 'OAM_S1AP_INTERFACE' and X_VENDOR_SOURCE_PORT_NUMBER = '36412') or 
+        (X_VENDOR_INTERFACE_TYPE = 'OAM_X2AP_INTERFACE' and X_VENDOR_SOURCE_PORT_NUMBER = 36422) or
+        (X_VENDOR_INTERFACE_TYPE = 'OAM_GTPU_INTERFACE' and X_VENDOR_SOURCE_PORT_NUMBER = 2152)) """
+    
+    update_bbu_ip_query_globalEnbIdInfoTable = """ UPDATE globalEnbIdInfoTable SET henb_self_address = ? """
+    
+
+    cursor.execute(update_bbu_ip_query_IpInterfaceTable, (BBU_IP_ADDRESS,))
+    cursor.execute(update_bbu_ip_query_globalEnbIdInfoTable, (BBU_IP_ADDRESS,))
+    # cursor.execute("UPDATE IpInterfaceTable SET IPInterfaceIPAddress = ? WHERE Alias = 'cpe-s1ap-1'", (BBU_IP_ADDRESS,))
+
+    
     # commit the changes to the database
     conn.commit()
 
