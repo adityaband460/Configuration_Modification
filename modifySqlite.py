@@ -1,17 +1,5 @@
 from openpyxl import load_workbook
 import sqlite3
-import ipaddress
-import sys
-
-
-def validateIP(ip):
-    try:
-        ipaddress.ip_address(ip)
-        print(f"Valid IP address: {ip} ")
-
-    except ValueError:
-        print(f"Invalid Ip address: {ip} exiting ...")
-        sys.exit(1)
 
 
 file_path = "./config-changes.xlsx"
@@ -46,11 +34,6 @@ BAND_INDICATOR_2 = sheet['E8'].value
 MME_IP_ADDRESS = sheet['B9'].value
 BBU_IP_ADDRESS = sheet['B10'].value
 
-
-
-
-validateIP(MME_IP_ADDRESS)
-validateIP(BBU_IP_ADDRESS)
 
 
 # print(PLMN, TAC)
