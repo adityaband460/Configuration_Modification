@@ -4,6 +4,10 @@ from openpyxl.utils import get_column_letter
 import sqlite3
 import sys
 
+def getDatabaseFilePath():
+    # Get the database file path from the user
+    
+    return db_path
 
 db_path = "./20250314_amannagar_b1_zte6-RelocTimers-alarm2.sqlite"
 
