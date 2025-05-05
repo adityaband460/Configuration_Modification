@@ -350,10 +350,10 @@ CREATE TABLE `IpInterfaceTable` (
 	`VLANName` ,
 	`Alias`
 );
-INSERT INTO IpInterfaceTable VALUES('1','192.168.66.70','','Static','OAM_S1AP_INTERFACE','36412',0,'','','cpe-s1ap-1');
-INSERT INTO IpInterfaceTable VALUES('1','192.168.66.70','','Static','OAM_X2AP_INTERFACE',36422,0,'','','cpe-x2ap-1');
-INSERT INTO IpInterfaceTable VALUES('1','192.168.66.70','','Static','OAM_GTPU_INTERFACE',2152,0,'','','cpe-gtpu-1');
-INSERT INTO IpInterfaceTable VALUES(0,'192.168.66.69','','Static','OAM_GTPU_INTERFACE',2152,0,'','','cpe-gtpu-2');
+INSERT INTO IpInterfaceTable VALUES('1','10.131.183.31','','Static','OAM_S1AP_INTERFACE','36412',0,'','','cpe-s1ap-1');
+INSERT INTO IpInterfaceTable VALUES('1','10.131.183.31','','Static','OAM_X2AP_INTERFACE',36422,0,'','','cpe-x2ap-1');
+INSERT INTO IpInterfaceTable VALUES('1','10.131.183.31','','Static','OAM_GTPU_INTERFACE',2152,0,'','','cpe-gtpu-1');
+INSERT INTO IpInterfaceTable VALUES(0,'fe80:0:0:0:7a45:c4ff:fe17:b509','','Static','OAM_GTPU_INTERFACE',2152,0,'','','cpe-gtpu-2');
 INSERT INTO IpInterfaceTable VALUES('1','10.131.183.31','','Static','OAM_TR069_INTERFACE','15210',0,'','','cpe-tr69-1');
 INSERT INTO IpInterfaceTable VALUES('1','172.16.81.66','','Static','OAM_XWAP_INTERFACE','36461',0,'','','cpe-xwap-1');
 INSERT INTO IpInterfaceTable VALUES('0','172.16.81.53','','Static','OAM_M2AP_INTERFACE','36443',0,'','','cpe-m2ap-1');
@@ -731,9 +731,9 @@ INSERT INTO EmergencyServiceInfoTable VALUES('0','1','4');
 INSERT INTO EmergencyServiceInfoTable VALUES('1','1','4');
 INSERT INTO EmergencyServiceInfoTable VALUES('2','1','4');
 CREATE TABLE IF NOT EXISTS "CellIdentityTable" ("CellIndex" , "CellIdentity", "Alias"  );
-INSERT INTO CellIdentityTable VALUES('0',1011,'cpe-cell-1');
-INSERT INTO CellIdentityTable VALUES('1',1012,'cpe-cell-2');
-INSERT INTO CellIdentityTable VALUES('2',1013,'cpe-cell-3');
+INSERT INTO CellIdentityTable VALUES('0',1000,'cpe-cell-1');
+INSERT INTO CellIdentityTable VALUES('1',1001,'cpe-cell-2');
+INSERT INTO CellIdentityTable VALUES('2',1002,'cpe-cell-3');
 CREATE TABLE IF NOT EXISTS "CellRestrictionInfoTable" ("CellIndex" , "CellBarred" , "BarringForEmergency" , "X_VENDOR_INTRA_FREQ_CELL_RESELECTION_INDICATOR" , "AC_BARRING_FACTOR_FOR_MO_SIGNALLING" , "AC_BARRING_TIME_FOR_MO_SIGNALLING" , "AC_BARRING_FOR_SPECIAL_AC_FOR_MO_SIGNALLING" , "AC_BARRING_FACTOR_FOR_MO_DATA" , "AC_BARRING_TIME_FOR_MO_DATA" , "AC_BARRING_FOR_SPECIAL_AC_FOR_MO_DATA" , "AC_BARRING_FACTOR_FOR_MMTEL_VOICE_R9" , "AC_BARRING_TIME_FOR_MMTEL_VOICE_R9" , "AC_BARRING_FOR_SPECIAL_AC_FOR_MMTEL_VOICE_R9" , "AC_BARRING_FACTOR_FOR_MMTEL_VIDEO_R9" , "AC_BARRING_TIME_FOR_MMTEL_VIDEO_R9" , "AC_BARRING_FOR_SPECIAL_AC_FOR_MMTEL_VIDEO_R9" , "AC_BARRING_FACTOR_FOR_CSFB_R10" , "AC_BARRING_TIME_FOR_CSFB_R10" , "AC_BARRING_FOR_SPECIAL_AC_FOR_CSFB_R10" );
 INSERT INTO CellRestrictionInfoTable VALUES('0','0','','Not Allowed','','','','','','','','','','','','','','','');
 INSERT INTO CellRestrictionInfoTable VALUES('1','0','','Not Allowed','','','','','','','','','','','','','','','');
@@ -864,7 +864,7 @@ INSERT INTO ROHCProfileTable VALUES('7','0','0','0','0','0','0','0','0','0','QCI
 INSERT INTO ROHCProfileTable VALUES('8','0','0','0','0','0','0','0','0','0','QCI8');
 INSERT INTO ROHCProfileTable VALUES('9','0','0','0','0','0','0','0','0','0','QCI9');
 CREATE TABLE IF NOT EXISTS "globalEnbIdInfoTable" ("HNBName" , "CELL_TYPE" , "X_VENDOR_CELL_STOP_NEEDED_FOR_NMM","self_enb_id","GlobalEnbId", "eNodeBAdminState", "henb_self_address" TEXT, "gpsSyncRequired");
-INSERT INTO globalEnbIdInfoTable VALUES('CDOT-eNodeb',0,'0','22','404-34-00016','1','192.168.66.70','0');
+INSERT INTO globalEnbIdInfoTable VALUES('CDOT-eNodeb',0,'0','22','404-34-00016','1','10.131.183.31','0');
 CREATE TABLE IF NOT EXISTS "SupportedAlarmsTable" ("EventType" TEXT, "ProbableCause" TEXT, "SpecificProblem" TEXT, "PerceivedSeverity" TEXT, "ReportingMechanism" TEXT, "ManagedObjectInstance" TEXT, "X_VENDOR_ALARM_ID" INTEGER PRIMARY KEY  NOT NULL  UNIQUE,"X_VENDOR_ALARM_ACTION" INTEGER );
 INSERT INTO SupportedAlarmsTable VALUES('Processing Error Alarm','Out Of Memory','Memory Allocation Failed','Major','3 Disabled','eNB.Software.SystemCall.IPCFailure.MemoryAllocationFailure.',1,0);
 INSERT INTO SupportedAlarmsTable VALUES('Processing Error Alarm','Software Error','Timer Start Failed Alarm','Minor','1 Queued','eNB.Software.SystemCall.TimerError.TimerStartFailure.',2,0);
@@ -1118,7 +1118,7 @@ INSERT INTO ENodeBCapabilitiesTable VALUES(3,1,3,1,3);
 CREATE TABLE IF NOT EXISTS "EnodebDeviceInfoTable" ("Manufacturer" TEXT, "ManufacturerOUI" TEXT, "ModelName" TEXT, "Description" TEXT, "ProductClass" TEXT, "SerialNumber" TEXT, "HardwareVersion" TEXT, "SoftwareVersion" TEXT, "ModemFirmwareVersion" TEXT, "AdditionalSoftwareVersion" TEXT, "SystemVersion" TEXT, "CfgVersion" TEXT, "Username" TEXT, "Password" TEXT, "UpTime" INTEGER, "FirstUseDate" DATETIME);
 INSERT INTO EnodebDeviceInfoTable VALUES('Center for Development of Telematics','002488','MACRO-ENB','Macro Enodeb','CHBBU300A','1114B00404','CHBBU300A','CD-LTERAN-G2S3-V1.4.6','V1.0.0','0.0.0','CD-LTERAN-G2S3-V1.4.6','CD-LTERAN-G2S3-ENB-CFG-V1.1.2','root','root',0,'2022-04-11T08:00:00-00:00');
 CREATE TABLE IF NOT EXISTS "mmeCommInfoTable" ("Enable" BOOL DEFAULT 0, "S1SigLinkServerList" TEXT PRIMARY KEY  NOT NULL, "S1SigLinkPort" TEXT DEFAULT 36412, "NUMSTREAM" TEXT DEFAULT 2, "RELOFMME" TEXT DEFAULT 0, "Alias");
-INSERT INTO mmeCommInfoTable VALUES(1,'192.168.29.16','36412','2','0','cdot-mme-1');
+INSERT INTO mmeCommInfoTable VALUES(1,'192.168.9.6','36412','2','0','cdot-mme-1');
 CREATE TABLE IF NOT EXISTS "rrcConfigurationInfoTable" ("numSectors" , "nonBroadcastSfnOffset" , "maxCellReconfigRetryCount" , "phySyncMode" , "no_of_uecc_instances" , "rest_rrc_core_no" , "vendorName" , "ue_context_list_size" );
 INSERT INTO rrcConfigurationInfoTable VALUES('3','1','1','1','1','3','CDOT','1');
 CREATE TABLE IF NOT EXISTS "oamModuleTimerInfoTable" ("TimerName" , "Value" );
@@ -1240,9 +1240,9 @@ INSERT INTO RntiTable VALUES('0','51','500','1','50','700','720','620','640','65
 INSERT INTO RntiTable VALUES('1','1325','1690','1','50','700','800','620','640','650','670');
 INSERT INTO RntiTable VALUES('2','725','1058','1','50','700','720','620','640','650','670');
 CREATE TABLE IF NOT EXISTS "RFParamsTable" ("CellIndex" CHAR PRIMARY KEY  NOT NULL , "AntennaPortsCount" , "FreqBandIndicator" , "DLBandwidth" , "ULBandwidth" , "ReferenceSignalPower" , "PhyCellID" , "PSCHPowerOffset" , "SSCHPowerOffset" , "PBCHPowerOffset" , "EARFCNDL" , "EARFCNUL" , "SubFrameAssignment" , "SpecialSubframePatterns" , "X_VENDOR_TDD_ACK_NACK_FEEDBACK_MODE" , "X_VENDOR_MAX_RS_EPRE" , "X_VENDOR_PCFICH_POWER_OFFSET" , "X_VENDOR_PHICH_POWER_OFFSET" , "X_VENDOR_PDCCH_POWER_OFFSET" , "X_VENDOR_PCH_TRANSMISSION_POWER" , "X_VENDOR_PHICH_RESOURCE" , "X_VENDOR_PHICH_DURATION" , "X_VENDOR_RB_SIZE", "RRHMaxTxPower");
-INSERT INTO RFParamsTable VALUES('0','2',9,'n25','n25','21',10,'0','0','0',25001,5012,'2','6','0','56','6000','6000','6000','6000','0','0','','32');
-INSERT INTO RFParamsTable VALUES('1','2',9,'n25','n25','21',11,'0','0','0',25002,5013,'2','6','0','56','6000','6000','6000','6000','0','0','','32');
-INSERT INTO RFParamsTable VALUES('2','2',9,'n25','n25','21',12,'0','0','0',25003,5014,'2','6','0','56','6000','6000','6000','6000','0','0','','32');
+INSERT INTO RFParamsTable VALUES('0','2',9,'n25','n25','21',10,'0','0','0',25001,5001,'2','6','0','56','6000','6000','6000','6000','0','0','',32);
+INSERT INTO RFParamsTable VALUES('1','2',9,'n25','n25','21',11,'0','0','0',25002,5002,'2','6','0','56','6000','6000','6000','6000','0','0','',32);
+INSERT INTO RFParamsTable VALUES('2','2',9,'n25','n25','21',12,'0','0','0',25003,5003,'2','6','0','56','6000','6000','6000','6000','0','0','',32);
 CREATE TABLE IF NOT EXISTS "eICICParamsTable" ("CellIndex" CHAR PRIMARY KEY  NOT NULL , "eICICProvisionType" , "NumAbsReport" , "AbsUsageLowThreshold" , "AbsUsageHighThreshold" , "LowLoadAbsPattern" , "VictimAbsPattern" , "VictimMeasSubset" , "eligible_ue" , "MacEicicMeasReportPeriodicity" , "AggressorSelTimer" , "LoadInformationGuardTimer" , "LoadInformationCollationTimer" , "DlSinrThreshLowMark" , "DlSinrThreshHighMark" );
 INSERT INTO eICICParamsTable VALUES('0','0','12','50','90','0101001010010100101001010010100101001010','0101001010010100101001010010100101001010','0101001010','70','1000','60','10','10','50','90');
 INSERT INTO eICICParamsTable VALUES('1','0','12','50','90','0101001010010100101001010010100101001010','0101001010010100101001010010100101001010','0101001010','70','1000','60','10','10','50','90');

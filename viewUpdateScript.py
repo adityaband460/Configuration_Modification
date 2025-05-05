@@ -17,7 +17,8 @@ def createCsvFromDatabaseFile(db_path: str, output_path: str = "sqlite_db.xlsx")
     worksheet.title = "Sheet1"
 
     ROW_TITLES = ['','PLMN', 'TAC', 'CELL_IDENTITY','PCI', 'DL_ARFCN_',
-                'UL_ARFCN', 'BAND_INDICATOR','MME_IP_ADDRESS', 'BBU_IP_ADDRESS']
+                'UL_ARFCN', 'BAND_INDICATOR','MME_IP_ADDRESS', 'BBU_IP_ADDRESS',
+                'DL_BANDWIDTH','UL_BANDWIDTH','RRH_MAX_TX_POWER','GLOBAL_ENB_ID','MANAGEMENT_MODE']
 
     COL_TITLES = ['','System','Sector-0', 'Sector-1', 'Sector-2']
 
@@ -150,6 +151,76 @@ def createCsvFromDatabaseFile(db_path: str, output_path: str = "sqlite_db.xlsx")
             cursor.execute(get_bbu_ip_address)
             BBU_IP_ADDRESS = cursor.fetchone()[0]
             worksheet.cell(row=10,column= 2, value=BBU_IP_ADDRESS)
+
+
+            # Get DL_Bandwidth
+            # RFParamsTable --> DLBandwidth
+
+            get_dl_bandwidth_0 = """ SELECT DLBandwidth FROM RFParamsTable WHERE CellIndex = '0' """
+            cursor.execute(get_dl_bandwidth_0)
+            DL_BANDWIDTH_0 = cursor.fetchone()[0]
+            worksheet.cell(row=11,column= 3, value=DL_BANDWIDTH_0)
+
+            get_dl_bandwidth_1 = """ SELECT DLBandwidth FROM RFParamsTable WHERE CellIndex = '1' """
+            cursor.execute(get_dl_bandwidth_1)
+            DL_BANDWIDTH_1 = cursor.fetchone()[0]
+            worksheet.cell(row=11,column= 4, value=DL_BANDWIDTH_1)
+
+            get_dl_bandwidth_2 = """ SELECT DLBandwidth FROM RFParamsTable WHERE CellIndex = '2' """
+            cursor.execute(get_dl_bandwidth_2)
+            DL_BANDWIDTH_2 = cursor.fetchone()[0]
+            worksheet.cell(row=11,column= 5, value=DL_BANDWIDTH_2)
+            
+            # Get UL_Bandwidth
+            # RFParamsTable --> ULBandwidth
+            get_ul_bandwidth_0 = """ SELECT ULBandwidth FROM RFParamsTable WHERE CellIndex = '0' """
+            cursor.execute(get_ul_bandwidth_0)
+            UL_BANDWIDTH_0 = cursor.fetchone()[0]
+            worksheet.cell(row=12,column= 3, value=UL_BANDWIDTH_0)
+
+            get_ul_bandwidth_1 = """ SELECT ULBandwidth FROM RFParamsTable WHERE CellIndex = '1' """
+            cursor.execute(get_ul_bandwidth_1)
+            UL_BANDWIDTH_1 = cursor.fetchone()[0]
+            worksheet.cell(row=12,column= 4, value=UL_BANDWIDTH_1)
+
+            get_ul_bandwidth_2 = """ SELECT ULBandwidth FROM RFParamsTable WHERE CellIndex = '2' """
+            cursor.execute(get_ul_bandwidth_2)
+            UL_BANDWIDTH_2 = cursor.fetchone()[0]
+            worksheet.cell(row=12,column= 5, value=UL_BANDWIDTH_2)
+            
+            # Get RFParamsTable --> RRHMaxTxPower 
+            get_rrh_max_tx_power_0 = """ SELECT RRHMaxTxPower FROM RFParamsTable WHERE CellIndex = '0' """
+            cursor.execute(get_rrh_max_tx_power_0)
+            RRH_MAX_TX_POWER_0 = int(cursor.fetchone()[0])
+            worksheet.cell(row=13,column= 3, value=RRH_MAX_TX_POWER_0)
+
+            get_rrh_max_tx_power_1 = """ SELECT RRHMaxTxPower FROM RFParamsTable WHERE CellIndex = '1' """
+            cursor.execute(get_rrh_max_tx_power_1)
+            RRH_MAX_TX_POWER_1 = int(cursor.fetchone()[0])
+            worksheet.cell(row=13,column= 4, value=RRH_MAX_TX_POWER_1)
+            
+            get_rrh_max_tx_power_2 = """ SELECT RRHMaxTxPower FROM RFParamsTable WHERE CellIndex = '2' """
+            cursor.execute(get_rrh_max_tx_power_2)
+            RRH_MAX_TX_POWER_2 = int(cursor.fetchone()[0])
+            worksheet.cell(row=13,column= 5, value=RRH_MAX_TX_POWER_2)
+
+            # Get globalEnbIdInfoTable --> GlobalEnbId
+            get_global_enb_id = """ SELECT GlobalEnbId FROM globalEnbIdInfoTable """
+            cursor.execute(get_global_enb_id)
+            GLOBAL_ENB_ID = cursor.fetchone()[0]
+            worksheet.cell(row=14,column= 2, value=GLOBAL_ENB_ID)
+
+            # Get ManagementMode
+            # EnodebParamsTable --> ManagementMode
+            get_management_mode = """ SELECT ManagementMode FROM EnodebParamsTable """
+            cursor.execute(get_management_mode)
+            MANAGEMENT_MODE = cursor.fetchone()[0]
+            worksheet.cell(row=15,column= 2, value=MANAGEMENT_MODE)
+
+
+
+
+
     except sqlite3.Error as e:
         print(f"SQLite error: {e}")
         exit(1)
@@ -205,6 +276,21 @@ def updateDatabaseFileFromCsv(db_path: str, input_path: str = "sqlite_db.xlsx"):
     MME_IP_ADDRESS = sheet['B9'].value
     BBU_IP_ADDRESS = sheet['B10'].value
 
+    DL_BANDWIDTH_0 = sheet['C11'].value
+    DL_BANDWIDTH_1 = sheet['D11'].value
+    DL_BANDWIDTH_2 = sheet['E11'].value
+
+    UL_BANDWIDTH_0 = sheet['C12'].value
+    UL_BANDWIDTH_1 = sheet['D12'].value
+    UL_BANDWIDTH_2 = sheet['E12'].value
+
+    RRH_MAX_TX_POWER_0 = sheet['C13'].value
+    RRH_MAX_TX_POWER_1 = sheet['D13'].value
+    RRH_MAX_TX_POWER_2 = sheet['E13'].value
+
+    GLOBAL_ENB_ID = sheet['B14'].value
+
+    MANAGEMENT_MODE = sheet['B15'].value
 
 
     # print(PLMN, TAC)
@@ -327,8 +413,41 @@ def updateDatabaseFileFromCsv(db_path: str, input_path: str = "sqlite_db.xlsx"):
 
             cursor.execute(update_bbu_ip_query_IpInterfaceTable, (BBU_IP_ADDRESS,))
             cursor.execute(update_bbu_ip_query_globalEnbIdInfoTable, (BBU_IP_ADDRESS,))
-            # cursor.execute("UPDATE IpInterfaceTable SET IPInterfaceIPAddress = ? WHERE Alias = 'cpe-s1ap-1'", (BBU_IP_ADDRESS,))
+            
+            # Update DL Bandwidth
+            # RFParamsTable --> DLBandwidth
 
+            update_dl_bandwidth_query_RFParamsTable = """ UPDATE RFParamsTable SET DLBandwidth = ?
+            WHERE CellIndex = ? """
+            cursor.execute(update_dl_bandwidth_query_RFParamsTable, (DL_BANDWIDTH_0,'0'))
+            cursor.execute(update_dl_bandwidth_query_RFParamsTable, (DL_BANDWIDTH_1,'1'))
+            cursor.execute(update_dl_bandwidth_query_RFParamsTable, (DL_BANDWIDTH_2,'2'))
+
+            # Update UL Bandwidth
+            # RFParamsTable --> ULBandwidth
+            update_ul_bandwidth_query_RFParamsTable = """ UPDATE RFParamsTable SET ULBandwidth = ?
+            WHERE CellIndex = ? """
+            cursor.execute(update_ul_bandwidth_query_RFParamsTable, (UL_BANDWIDTH_0,'0'))
+            cursor.execute(update_ul_bandwidth_query_RFParamsTable, (UL_BANDWIDTH_1,'1'))
+            cursor.execute(update_ul_bandwidth_query_RFParamsTable, (UL_BANDWIDTH_2,'2'))
+
+            # Update RRH Max Tx Power
+            # RFParamsTable --> RRHMaxTxPower
+            update_rrh_max_tx_power_query_RFParamsTable = """ UPDATE RFParamsTable SET RRHMaxTxPower = ?
+            WHERE CellIndex = ? """
+            cursor.execute(update_rrh_max_tx_power_query_RFParamsTable, (RRH_MAX_TX_POWER_0,'0'))
+            cursor.execute(update_rrh_max_tx_power_query_RFParamsTable, (RRH_MAX_TX_POWER_1,'1'))
+            cursor.execute(update_rrh_max_tx_power_query_RFParamsTable, (RRH_MAX_TX_POWER_2,'2'))
+
+            # Update globalEnbIdInfoTable --> GlobalEnbId
+            update_global_enb_id_query = """ UPDATE globalEnbIdInfoTable SET GlobalEnbId = ? """
+            cursor.execute(update_global_enb_id_query, (GLOBAL_ENB_ID,))
+            
+            # Update Management Mode
+            # EnodebParamsTable --> ManagementMode
+            update_management_mode_query = """ UPDATE EnodebParamsTable SET ManagementMode = ? """
+            cursor.execute(update_management_mode_query, (MANAGEMENT_MODE,))
+            
             
             # commit the changes to the database
             conn.commit()
