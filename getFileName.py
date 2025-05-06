@@ -3,8 +3,6 @@
 import re
 import os
 
-# need to update code is not correct
-
 runlte_path = '/home/baditya/Downloads/PI_REL_V1.4.6-P2/cm/sw/bin/run_lte_enbsm'
 with open(runlte_path, 'r') as file:
 
