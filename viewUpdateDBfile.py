@@ -3,7 +3,6 @@ import sqlite3
 import sys
 import re
 import os
-from turtle import update
 
 # Get the database file path from the folder
 def getDatabaseFilePath():
@@ -670,4 +669,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-G
