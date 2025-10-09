@@ -5,6 +5,9 @@ for each BBM card, maps the bandwidth to the corresponding radio profile, and up
 the radio profile on each BBM card via SSH. Finally, it restarts the smInit
 service to apply the changes.
 
+This script is written for Python 3.5.3
+updated at 8 Oct 2025 : 12:13 PM by Aditya
+
 '''
 
 
@@ -71,15 +74,13 @@ def get_radioProfiles(input_path: str = "sqlite_db.csv"):
     return radio_profiles
 
 # Function to input radio profiles array and update the database file
-def updateRadioProfiles():
-
-    waitForBBMToBeReachable()
-
+# input pluggedIn_status as list of 3 integers
+def updateRadioProfiles(pluggedIn_status):
+    
     radio_profiles = get_radioProfiles()
-
     username = "root"
     password = "root"
-    
+
     # Assuming the script is in package folder
     global package_path
     package_path = os.path.dirname(os.path.abspath(__file__))
@@ -96,12 +97,6 @@ def updateRadioProfiles():
     bbm2_put = """sshpass -p '{0}' scp -o StrictHostKeyChecking=no -r bbm {1}@{2}:/home/root 
     """.format(password, username, bbm2_ip)
 
-    subprocess.call(bbm0_put, shell=True)
-    print("copied bbm to bbm0")
-    subprocess.call(bbm1_put, shell=True)
-    print("copied bbm to bbm1")
-    subprocess.call(bbm2_put, shell=True)
-    print("copied bbm to bbm2")
 
     # ssh to BBM card 0 and change permission of bbm folder
     # change radio profiles according to bandwidth
@@ -114,9 +109,7 @@ def updateRadioProfiles():
     change_bbm0_radio_profile = """sshpass -p '{0}' ssh -o StrictHostKeyChecking=no {1}@{2} "{4}"
     """.format(password, username, bbm0_ip, radio_profiles[0], bbm0_cmd)
 
-    print("logging into bbm0 to change radio profile")
-    subprocess.call(change_bbm0_radio_profile, shell=True)
-    print("changed radio profile on bbm0")
+    
 
     # ssh to BBM card 1 and change permission of bbm folder
     # change radio profiles according to bandwidth
@@ -128,9 +121,7 @@ def updateRadioProfiles():
     change_bbm1_radio_profile = """sshpass -p '{0}' ssh -o StrictHostKeyChecking=no {1}@{2} "{4}"
     """.format(password, username, bbm1_ip, radio_profiles[1], bbm1_cmd)
 
-    print("logging into bbm1 to change radio profile")
-    subprocess.call(change_bbm1_radio_profile, shell=True)
-    print("changed radio profile on bbm1")
+
 
     # ssh to BBM card 2 and change permission of bbm folder
     # change radio profiles according to bandwidth
@@ -142,9 +133,40 @@ def updateRadioProfiles():
 
     change_bbm2_radio_profile = """sshpass -p '{0}' ssh -o StrictHostKeyChecking=no {1}@{2} "{4}"
     """.format(password, username, bbm2_ip, radio_profiles[2], bbm2_cmd)
-    print("logging into bbm2 to change radio profile")
-    subprocess.call(change_bbm2_radio_profile, shell=True)
-    print("changed radio profile on bbm2")
+    
+    # base on plugged In status take action accordingly
+    if pluggedIn_status[0] ==1:
+        print("coping bbm to bbm0...")
+        subprocess.call(bbm0_put, shell=True)
+        print("copying completed on bbm0")
+        print("logging into bbm0 to change radio profile")
+        subprocess.call(change_bbm0_radio_profile, shell=True)
+        print("changed radio profile on bbm0")
+    else:
+        print("bbm0 is not rechable")
+    
+    if pluggedIn_status[1] == 1:
+        print("coping bbm to bbm1...")
+        subprocess.call(bbm1_put, shell=True)
+        print("copying completed on bbm1")
+        print("logging into bbm1 to change radio profile")
+        subprocess.call(change_bbm1_radio_profile, shell=True)
+        print("changed radio profile on bbm1")
+    else:
+        print("bbm1 is not rechable")
+    
+    if pluggedIn_status[2] == 1:
+        print("coping bbm to bbm2...")
+        subprocess.call(bbm2_put, shell=True)
+        print("copying completed on bbm2")
+        print("logging into bbm2 to change radio profile")
+        subprocess.call(change_bbm2_radio_profile, shell=True)
+        print("changed radio profile on bbm2")
+    else:
+        print("bbm2 is not rechable")
+
+
+
 def stopAllenbsm():
     # move to package path
     os.chdir("{}/cm/sw/bin".format(package_path))
@@ -153,22 +175,57 @@ def stopAllenbsm():
     cmd = "systemctl stop smInit.service && systemctl stop ftm.service && ./killall_enbsm"            
     subprocess.call(cmd,shell=True)
     os.chdir(package_path)
+
+def getBBMPluggedInStatus():
+    # check if bbm cards are plugged in by checking ping response
+    print("getting bbm plugged in status ...")
+    ping_bbm0 = "ping -c 1 {} > /dev/null 2>&1".format(bbm0_ip)
+    ping_bbm1 = "ping -c 1 {} > /dev/null 2>&1".format(bbm1_ip)
+    ping_bbm2 = "ping -c 1 {} > /dev/null 2>&1".format(bbm2_ip)
     
-def waitForBBMToBeReachable():
-    # wait for ping to be successful for all bbm cards
+    bbm0_status = 0
+    bbm1_status = 0
+    bbm2_status = 0
+    
+    if subprocess.call(ping_bbm0, shell=True) == 0:
+        bbm0_status = 1
+        print("bbm0 is plugged in")    
+    if subprocess.call(ping_bbm1, shell=True) == 0:
+        bbm1_status = 1
+        print("bbm1 is plugged in")
+    if subprocess.call(ping_bbm2, shell=True) == 0:
+        bbm2_status = 1
+        print("bbm2 is plugged in")
+        
+    return [bbm0_status, bbm1_status, bbm2_status]
+
+# input 3 integer 0,1,2 for reachable bbm cards so wait for them to be reachable
+# take list[int] as input
+def waitForBBMToBeReachable(pluggedIn_status ):
+    # wait for ping to be successful for bbm cards whose plugged in status is 1
     ping_bbm0 = "ping -c 1 {} > /dev/null 2>&1".format(bbm0_ip)
     ping_bbm1 = "ping -c 1 {} > /dev/null 2>&1".format(bbm1_ip)
     ping_bbm2 = "ping -c 1 {} > /dev/null 2>&1".format(bbm2_ip)
 
+    # pluggedIn_status = getBBMPluggedInStatus()
+
     while True:
-        if subprocess.call(ping_bbm0, shell=True) == 0 and subprocess.call(ping_bbm1, shell=True) == 0 and subprocess.call(ping_bbm2, shell=True) == 0:
-            print("All BBM cards are reachable")
+        # wait only for plugged in and not reachable bbm cards
+        # wait for plugged_In =1  and ping = non zero
+        # readiness status = 1  : no need to wait for that bbm card
+
+        bbm0_status = 0 if pluggedIn_status[0] == 1 and subprocess.call(ping_bbm0, shell=True) != 0 else 1
+        bbm1_status = 0 if pluggedIn_status[1] == 1 and subprocess.call(ping_bbm1, shell=True) != 0 else 1
+        bbm2_status = 0 if pluggedIn_status[2] == 1 and subprocess.call(ping_bbm2, shell=True) != 0 else 1
+
+        if bbm0_status == 1 and bbm1_status == 1 and bbm2_status == 1:
             break
         else:
             print("Waiting for BBM cards to be reachable...")
-            time.sleep(1)
+            time.sleep(2)
 
-def startSmInitService():
+
+def startSmInitService(pluggedIn_status):
     stopAllenbsm()
     # move to home path
     os.chdir("/root")
@@ -192,8 +249,7 @@ def startSmInitService():
 
 
     time.sleep(2)
-    waitForBBMToBeReachable()
-
+    waitForBBMToBeReachable(pluggedIn_status)
 
     print("Starting smInit service")
     # enable smInit service
@@ -208,8 +264,9 @@ def startSmInitService():
     print("smInit service started")
 
 def main():
-    updateRadioProfiles()
-    startSmInitService()
+    PluggedIn_status = getBBMPluggedInStatus()
+    updateRadioProfiles(pluggedIn_status=PluggedIn_status)
+    startSmInitService(pluggedIn_status=PluggedIn_status)
 
 if __name__ == "__main__":
     main()
